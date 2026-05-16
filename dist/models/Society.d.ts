@@ -1,5 +1,9 @@
 import { type Document, type Model } from "mongoose";
 import { type SocietyType } from "../types/roles.js";
+export type SocietyDocuments = {
+    registrationCertificate?: string | null;
+    panOrGst?: string | null;
+};
 export interface ISociety {
     name: string;
     type: SocietyType;
@@ -9,6 +13,9 @@ export interface ISociety {
     wings: number;
     flats: number;
     floors: number;
+    blocks: number;
+    houses: number;
+    documents: SocietyDocuments;
 }
 export interface ISocietyDocument extends ISociety, Document {
 }

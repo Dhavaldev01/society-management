@@ -70,15 +70,22 @@ export async function registerSocietyAdmin(
     throw err;
   }
 
+  const s = input.society;
   const society = await Society.create({
-    name: input.society.name.trim(),
-    type: input.society.type,
-    address: input.society.address.trim(),
-    city: input.society.city.trim(),
-    pincode: input.society.pincode.trim(),
-    wings: input.society.wings,
-    flats: input.society.flats,
-    floors: input.society.floors,
+    name: s.name.trim(),
+    type: s.type,
+    address: s.address.trim(),
+    city: s.city.trim(),
+    pincode: s.pincode.trim(),
+    wings: s.type === "APARTMENT" ? s.wings : 0,
+    flats: s.type === "APARTMENT" ? s.flats : 0,
+    floors: s.type === "APARTMENT" ? s.floors : 0,
+    blocks: s.type === "BLOCK_WISE" ? s.blocks : 0,
+    houses: s.type === "BLOCK_WISE" ? s.houses : 0,
+    documents: {
+      registrationCertificate: s.documents?.registrationCertificate ?? null,
+      panOrGst: s.documents?.panOrGst ?? null,
+    },
   });
 
   try {
