@@ -16,6 +16,9 @@ export type SafeUser = {
   role: ClientRole;
   societyId: string | null;
   societyName: string | null;
+  onboardingCompleted: boolean;
+  superAdminResidencyCompleted: boolean;
+  needsSuperAdminResidency: boolean;
   createdAt: Date;
 };
 
@@ -29,6 +32,9 @@ async function toSafeUser(user: IUserDocument): Promise<SafeUser> {
     role: toClientRole(user.role),
     societyId: society.societyId,
     societyName: society.societyName,
+    onboardingCompleted: society.onboardingCompleted,
+    superAdminResidencyCompleted: society.superAdminResidencyCompleted,
+    needsSuperAdminResidency: society.needsSuperAdminResidency,
     createdAt: user.createdAt,
   };
 }
@@ -59,14 +65,18 @@ export async function registerUser(input: RegisterInput): Promise<{ user: SafeUs
 
 export async function registerSocietyAdmin(
   input: RegisterSocietyInput,
-): Promise<{ user: SafeUser; token: string }> {
+): Promise<{ user: SafeUser; token: string; onboardingRequired: boolean }> {
   const email = input.email.toLowerCase();
   const existing = await User.findOne({ email });
   if (existing) throw httpError("Email already registered", 409);
 
-  const user = await registerSocietyWithRelations(input);
+  const { user, onboardingRequired } = await registerSocietyWithRelations(input);
   const safe = await toSafeUser(user);
-  return { user: safe, token: issueToken({ id: safe.id, email: safe.email, role: user.role }) };
+  return {
+    user: safe,
+    token: issueToken({ id: safe.id, email: safe.email, role: user.role }),
+    onboardingRequired,
+  };
 }
 
 export async function loginUser(input: LoginInput): Promise<{ user: SafeUser; token: string }> {

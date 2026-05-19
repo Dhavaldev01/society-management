@@ -32,16 +32,22 @@ export async function createMemberPending(
     isActive: false,
   });
 
+  const ownershipType = input.ownershipType ?? "OWNER";
   const member = await SocietyMember.create({
     societyId,
     userId: user._id,
+    propertyId: null,
+    societyRole: ownershipType === "TENANT" ? "TENANT" : "OWNER",
+    isResident: true,
+    isPrimaryOwner: false,
+    onboardingCompleted: true,
     unitId:
       input.unitId && mongoose.isValidObjectId(input.unitId)
         ? new mongoose.Types.ObjectId(input.unitId)
         : null,
     flatNumber: input.flatNumber?.trim() || "",
     floorNumber: input.floorNumber ?? 0,
-    ownershipType: input.ownershipType ?? "OWNER",
+    ownershipType,
     status: "PENDING",
   });
 

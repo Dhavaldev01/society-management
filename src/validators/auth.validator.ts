@@ -19,13 +19,15 @@ const societyBaseSchema = z.object({
 const apartmentSocietySchema = societyBaseSchema.extend({
   type: z.literal("APARTMENT"),
   wings: z.coerce.number().int().min(0).default(0),
-  flats: z.coerce.number().int().min(0).default(0),
   floors: z.coerce.number().int().min(0).default(0),
+  flatsPerFloor: z.coerce.number().int().min(0).default(0),
+  flats: z.coerce.number().int().min(0).default(0),
 });
 
 const blockWiseSocietySchema = societyBaseSchema.extend({
   type: z.literal("BLOCK_WISE"),
   blocks: z.coerce.number().int().min(0).default(0),
+  housesPerBlock: z.coerce.number().int().min(0).default(0),
   houses: z.coerce.number().int().min(0).default(0),
 });
 

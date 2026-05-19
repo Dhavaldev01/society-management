@@ -26,13 +26,15 @@ export interface ISociety {
   state: string;
   pincode: string;
   layoutType: SocietyLayoutType;
-  /** Planned counts from registration (apartment: wings/flats/floors, block: blocks/houses). */
+  /** Planned counts from registration (apartment: wings/floors/flatsPerFloor, block: blocks/housesPerBlock). */
   structureMeta: {
     wings: number;
     flats: number;
     floors: number;
+    flatsPerFloor: number;
     blocks: number;
     houses: number;
+    housesPerBlock: number;
   };
   /** Actual blocks/wings created by super admin. */
   units: Types.DocumentArray<ISocietyUnit>;
@@ -69,8 +71,10 @@ const societySchema = new Schema<ISocietyDocument>(
       wings: { type: Number, default: 0 },
       flats: { type: Number, default: 0 },
       floors: { type: Number, default: 0 },
+      flatsPerFloor: { type: Number, default: 0 },
       blocks: { type: Number, default: 0 },
       houses: { type: Number, default: 0 },
+      housesPerBlock: { type: Number, default: 0 },
     },
     units: { type: [societyUnitSchema], default: [] },
     documents: {

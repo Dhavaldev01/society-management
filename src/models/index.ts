@@ -1,6 +1,11 @@
 export { User, type IUserDocument } from "./User.js";
 export { Society, type ISocietyDocument, type ISocietyUnit } from "./Society.js";
 export { SocietyMember, type ISocietyMemberDocument } from "./SocietyMember.js";
+export { Property, type IPropertyDocument } from "./Property.js";
+export { Family, type IFamilyDocument } from "./Family.js";
+export { FamilyMember, type IFamilyMemberDocument } from "./FamilyMember.js";
+export { PropertyHistory, type IPropertyHistoryDocument } from "./PropertyHistory.js";
+export { Vehicle, type IVehicleDocument } from "./Vehicle.js";
 export { AdminAssignment, type IAdminAssignmentDocument } from "./AdminAssignment.js";
 export { ChangeRequest, type IChangeRequestDocument } from "./ChangeRequest.js";
 export { AuditLog, type IAuditLogDocument } from "./AuditLog.js";

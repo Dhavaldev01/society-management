@@ -12,8 +12,8 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
 export const registerSociety = asyncHandler(async (req: Request, res: Response) => {
   const body = req.body as RegisterSocietyInput;
-  const { user, token } = await authService.registerSocietyAdmin(body);
-  sendSuccess(res, { user, token }, 201);
+  const { user, token, onboardingRequired } = await authService.registerSocietyAdmin(body);
+  sendSuccess(res, { user, token, onboardingRequired }, 201);
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {

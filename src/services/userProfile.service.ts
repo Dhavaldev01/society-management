@@ -5,7 +5,13 @@ import { httpError } from "../utils/httpError.js";
 
 export async function getPrimarySocietyForUser(
   userId: Types.ObjectId,
-): Promise<{ societyId: string; societyName: string } | null> {
+): Promise<{
+  societyId: string;
+  societyName: string;
+  onboardingCompleted: boolean;
+  superAdminResidencyCompleted: boolean;
+  needsSuperAdminResidency: boolean;
+} | null> {
   const membership = await SocietyMember.findOne({
     userId,
     status: "ACTIVE",
@@ -18,9 +24,17 @@ export async function getPrimarySocietyForUser(
   const society = await Society.findById(membership.societyId).select("name").lean();
   if (!society) return null;
 
+  const needsSuperAdminResidency =
+    membership.societyRole === "ADMIN" &&
+    !membership.superAdminResidencyCompleted &&
+    !membership.propertyId;
+
   return {
     societyId: membership.societyId.toString(),
     societyName: society.name,
+    onboardingCompleted: membership.onboardingCompleted ?? true,
+    superAdminResidencyCompleted: membership.superAdminResidencyCompleted ?? true,
+    needsSuperAdminResidency,
   };
 }
 
@@ -29,6 +43,9 @@ export async function attachSocietyContext(user: IUserDocument) {
   return {
     societyId: society?.societyId ?? null,
     societyName: society?.societyName ?? null,
+    onboardingCompleted: society?.onboardingCompleted ?? true,
+    superAdminResidencyCompleted: society?.superAdminResidencyCompleted ?? true,
+    needsSuperAdminResidency: society?.needsSuperAdminResidency ?? false,
   };
 }
 

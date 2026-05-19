@@ -7,6 +7,11 @@ import {
 } from "../middleware/societyAccess.middleware.js";
 import * as societyController from "../controllers/society.controller.js";
 import * as billingController from "../controllers/billing.controller.js";
+import * as onboardingController from "../controllers/onboarding.controller.js";
+import * as propertyController from "../controllers/property.controller.js";
+import * as familyController from "../controllers/family.controller.js";
+import * as transferController from "../controllers/transfer.controller.js";
+import * as residentSetupController from "../controllers/residentSetup.controller.js";
 import { validate } from "../middleware/validate.middleware.js";
 import { maintenanceDashboardQuerySchema } from "../validators/billing.validator.js";
 
@@ -15,6 +20,59 @@ const router = Router({ mergeParams: true });
 router.use(authenticateJwt, requireSocietyAccess);
 
 router.get("/overview", societyController.getOverview);
+
+router.get("/onboarding/status", requireRoles("SUPER_ADMIN"), onboardingController.getOnboardingStatus);
+router.get("/residency/flow-status", requireRoles("SUPER_ADMIN"), residentSetupController.getFlowStatus);
+router.post("/onboarding/skip-residency", requireRoles("SUPER_ADMIN"), onboardingController.skipResidency);
+router.patch("/members/me/residency", requireRoles("SUPER_ADMIN"), onboardingController.assignResidency);
+router.post(
+  "/members/me/complete-residency",
+  requireRoles("SUPER_ADMIN"),
+  residentSetupController.completeSuperAdminResidency,
+);
+router.post(
+  "/members/complete",
+  requireRoles("SUPER_ADMIN", "ADMIN"),
+  residentSetupController.completeResident,
+);
+router.get(
+  "/properties/search",
+  requireRoles("SUPER_ADMIN", "ADMIN"),
+  residentSetupController.searchProperties,
+);
+
+router.get("/properties", requireRoles("SUPER_ADMIN", "ADMIN"), propertyController.listProperties);
+router.get("/properties/:propertyId", requireRoles("SUPER_ADMIN", "ADMIN"), propertyController.getProperty);
+router.get("/properties/:propertyId/view", requireRoles("SUPER_ADMIN", "ADMIN"), propertyController.getPropertyView);
+router.get(
+  "/properties/:propertyId/residents",
+  requireRoles("SUPER_ADMIN", "ADMIN"),
+  propertyController.getPropertyResidents,
+);
+router.get(
+  "/properties/:propertyId/history",
+  requireRoles("SUPER_ADMIN", "ADMIN"),
+  propertyController.getPropertyHistory,
+);
+
+router.post("/families", requireRoles("SUPER_ADMIN", "ADMIN", "MEMBER"), familyController.createMyFamily);
+router.get("/families/me", requireRoles("SUPER_ADMIN", "ADMIN", "MEMBER"), familyController.getMyFamily);
+router.get("/families", requireRoles("SUPER_ADMIN", "ADMIN"), familyController.listFamiliesByProperty);
+router.post(
+  "/families/:familyId/members",
+  requireRoles("SUPER_ADMIN", "ADMIN", "MEMBER"),
+  familyController.addFamilyMember,
+);
+router.delete(
+  "/family-members/:familyMemberId",
+  requireRoles("SUPER_ADMIN", "ADMIN", "MEMBER"),
+  familyController.deleteFamilyMember,
+);
+
+router.post("/members/owner", requireRoles("SUPER_ADMIN", "ADMIN"), transferController.postAddOwner);
+router.post("/members/tenant", requireRoles("SUPER_ADMIN", "ADMIN"), transferController.postAddTenant);
+router.post("/transfers/tenant", requireRoles("SUPER_ADMIN"), transferController.postTransferTenant);
+router.post("/transfers/owner", requireRoles("SUPER_ADMIN"), transferController.postTransferOwner);
 
 router.get(
   "/billing/dashboard",

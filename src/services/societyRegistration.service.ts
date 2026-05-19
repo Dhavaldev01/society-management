@@ -4,6 +4,7 @@ import type { SocietyLayoutType } from "../types/roles.js";
 import { hashPassword } from "../utils/password.js";
 import { Society, SocietyMember, User, type IUserDocument } from "../models/index.js";
 import { writeAuditLog } from "./audit.service.js";
+import { generateUnitsAndProperties } from "./structureGenerator.service.js";
 
 function structureMetaFromInput(s: RegisterSocietyInput["society"]): {
   layoutType: SocietyLayoutType;
@@ -11,26 +12,46 @@ function structureMetaFromInput(s: RegisterSocietyInput["society"]): {
     wings: number;
     flats: number;
     floors: number;
+    flatsPerFloor: number;
     blocks: number;
     houses: number;
+    housesPerBlock: number;
   };
 } {
   if (s.type === "APARTMENT") {
+    const flatsPerFloor = s.flatsPerFloor > 0 ? s.flatsPerFloor : s.flats;
     return {
       layoutType: "APARTMENT",
-      structureMeta: { wings: s.wings, flats: s.flats, floors: s.floors, blocks: 0, houses: 0 },
+      structureMeta: {
+        wings: s.wings,
+        flats: flatsPerFloor,
+        floors: s.floors,
+        flatsPerFloor,
+        blocks: 0,
+        houses: 0,
+        housesPerBlock: 0,
+      },
     };
   }
+  const housesPerBlock = s.housesPerBlock > 0 ? s.housesPerBlock : s.houses;
   return {
     layoutType: "BLOCK_WISE",
-    structureMeta: { wings: 0, flats: 0, floors: 0, blocks: s.blocks, houses: s.houses },
+    structureMeta: {
+      wings: 0,
+      flats: 0,
+      floors: 0,
+      flatsPerFloor: 0,
+      blocks: s.blocks,
+      houses: housesPerBlock,
+      housesPerBlock,
+    },
   };
 }
 
-/** Step 1: Register society → SUPER_ADMIN user + society + ACTIVE membership */
+/** Register society → SUPER_ADMIN user + society + units/properties + ADMIN membership */
 export async function registerSocietyWithRelations(
   input: RegisterSocietyInput,
-): Promise<IUserDocument> {
+): Promise<{ user: IUserDocument; societyId: string; onboardingRequired: boolean }> {
   const email = input.email.toLowerCase();
   const { layoutType, structureMeta } = structureMetaFromInput(input.society);
   const passwordHash = await hashPassword(input.password);
@@ -78,11 +99,19 @@ export async function registerSocietyWithRelations(
     const society = createdSocieties[0];
     if (!society) throw new Error("Failed to create society");
 
+    await generateUnitsAndProperties(society, session);
+
     await SocietyMember.create(
       [
         {
           societyId: society._id,
           userId: user._id,
+          propertyId: null,
+          societyRole: "ADMIN",
+          isResident: false,
+          isPrimaryOwner: false,
+          onboardingCompleted: false,
+          superAdminResidencyCompleted: false,
           unitId: null,
           flatNumber: "",
           floorNumber: 0,
@@ -102,7 +131,11 @@ export async function registerSocietyWithRelations(
       after: { societyId: society._id.toString(), superAdminId: user._id.toString() },
     });
 
-    return user;
+    return {
+      user,
+      societyId: society._id.toString(),
+      onboardingRequired: true,
+    };
   } catch (error) {
     await session.abortTransaction();
     throw error;
