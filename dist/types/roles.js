@@ -1,4 +1,6 @@
-export const ROLES = ["SUPER_ADMIN", "ADMIN", "RESIDENT", "SECURITY"];
-/** Layout mode: apartment (wings/flats/floors) or block-wise (blocks/houses). */
-export const SOCIETY_TYPES = ["APARTMENT", "BLOCK_WISE"];
+export const ROLES = ["SUPER_ADMIN", "ADMIN", "MEMBER"];
+export const MEMBER_STATUSES = ["PENDING", "ACTIVE", "REJECTED"];
+export const OWNERSHIP_TYPES = ["OWNER", "TENANT"];
+export const UNIT_STATUSES = ["ACTIVE", "INACTIVE"];
+export const SOCIETY_LAYOUT_TYPES = ["APARTMENT", "BLOCK_WISE"];
 //# sourceMappingURL=roles.js.map

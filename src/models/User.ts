@@ -1,13 +1,13 @@
-import mongoose, { type Document, type Model, Schema, Types } from "mongoose";
+import mongoose, { type Document, type Model, Schema } from "mongoose";
 import { ROLES, type Role } from "../types/roles.js";
 
 export interface IUser {
-  email: string;
-  password: string;
   fullName: string;
-  mobile: string | null;
+  email: string;
+  phone: string | null;
+  passwordHash: string;
   role: Role;
-  societyId: Types.ObjectId | null;
+  isActive: boolean;
 }
 
 export interface IUserDocument extends IUser, Document {
@@ -17,17 +17,14 @@ export interface IUserDocument extends IUser, Document {
 
 const userSchema = new Schema<IUserDocument>(
   {
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true },
     fullName: { type: String, required: true, trim: true },
-    mobile: { type: String, default: null, trim: true },
-    role: { type: String, enum: ROLES, default: "RESIDENT" },
-    societyId: { type: Schema.Types.ObjectId, ref: "Society", default: null },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    phone: { type: String, default: null, trim: true },
+    passwordHash: { type: String, required: true },
+    role: { type: String, enum: ROLES, required: true },
+    isActive: { type: Boolean, default: false },
   },
-  {
-    timestamps: true,
-    collection: "users",
-  },
+  { timestamps: true, collection: "users" },
 );
 
 export const User: Model<IUserDocument> =

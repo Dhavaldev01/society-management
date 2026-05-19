@@ -1,59 +1,39 @@
 import type { Request, Response } from "express";
-import { loginSchema, registerSchema, registerSocietySchema } from "../validators/auth.validator.js";
+import type { LoginInput, RegisterInput, RegisterSocietyInput } from "../validators/auth.validator.js";
 import * as authService from "../services/auth.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { sendFailure, sendSuccess } from "../utils/apiResponse.js";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const parsed = registerSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ success: false, message: "Validation failed", errors: parsed.error.flatten() });
-    return;
-  }
-
-  const { user, token } = await authService.registerUser(parsed.data);
-  res.status(201).json({
-    success: true,
-    data: { user, token },
-  });
+  const body = req.body as RegisterInput;
+  const { user, token } = await authService.registerUser(body);
+  sendSuccess(res, { user, token }, 201);
 });
 
 export const registerSociety = asyncHandler(async (req: Request, res: Response) => {
-  const parsed = registerSocietySchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ success: false, message: "Validation failed", errors: parsed.error.flatten() });
-    return;
-  }
-
-  const { user, token } = await authService.registerSocietyAdmin(parsed.data);
-  res.status(201).json({ success: true, data: { user, token } });
+  const body = req.body as RegisterSocietyInput;
+  const { user, token } = await authService.registerSocietyAdmin(body);
+  sendSuccess(res, { user, token }, 201);
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
-  const parsed = loginSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ success: false, message: "Validation failed", errors: parsed.error.flatten() });
-    return;
-  }
-
-  const { user, token } = await authService.loginUser(parsed.data);
-  res.json({
-    success: true,
-    data: { user, token },
-  });
+  const body = req.body as LoginInput;
+  const { user, token } = await authService.loginUser(body);
+  sendSuccess(res, { user, token });
 });
 
 export const me = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
-    res.status(401).json({ success: false, message: "Unauthorized" });
+    sendFailure(res, "Unauthorized", 401);
     return;
   }
 
   const user = await authService.getUserById(userId);
   if (!user) {
-    res.status(404).json({ success: false, message: "User not found" });
+    sendFailure(res, "User not found", 404);
     return;
   }
 
-  res.json({ success: true, data: { user } });
+  sendSuccess(res, { user });
 });

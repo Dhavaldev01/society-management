@@ -1,12 +1,12 @@
-import { type Document, type Model, Types } from "mongoose";
+import { type Document, type Model } from "mongoose";
 import { type Role } from "../types/roles.js";
 export interface IUser {
-    email: string;
-    password: string;
     fullName: string;
-    mobile: string | null;
+    email: string;
+    phone: string | null;
+    passwordHash: string;
     role: Role;
-    societyId: Types.ObjectId | null;
+    isActive: boolean;
 }
 export interface IUserDocument extends IUser, Document {
     createdAt: Date;

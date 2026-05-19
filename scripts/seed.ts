@@ -15,9 +15,11 @@ async function main() {
   } else {
     await User.create({
       email,
-      password: await hashPassword(password),
+      passwordHash: await hashPassword(password),
       fullName: "Seed Super Admin",
+      phone: null,
       role: "SUPER_ADMIN",
+      isActive: true,
     });
     console.log(`Seed complete: ${email} (SUPER_ADMIN)`);
   }

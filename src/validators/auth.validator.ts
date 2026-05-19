@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SOCIETY_TYPES } from "../types/roles.js";
+import { SOCIETY_LAYOUT_TYPES } from "../types/roles.js";
 
 const optionalDocumentsSchema = z
   .object({
@@ -51,5 +51,3 @@ export const loginSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type RegisterSocietyInput = z.infer<typeof registerSocietySchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
-
-export { SOCIETY_TYPES };

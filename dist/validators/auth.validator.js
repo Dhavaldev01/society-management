@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { SOCIETY_TYPES } from "../types/roles.js";
 const optionalDocumentsSchema = z
     .object({
     registrationCertificate: z.string().trim().min(1).optional(),
@@ -40,5 +39,4 @@ export const loginSchema = z.object({
     email: z.string().email(),
     password: z.string().min(1),
 });
-export { SOCIETY_TYPES };
 //# sourceMappingURL=auth.validator.js.map

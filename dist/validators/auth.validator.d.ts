@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { SOCIETY_TYPES } from "../types/roles.js";
 export declare const registerSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
@@ -184,5 +183,4 @@ export declare const loginSchema: z.ZodObject<{
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type RegisterSocietyInput = z.infer<typeof registerSocietySchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
-export { SOCIETY_TYPES };
 //# sourceMappingURL=auth.validator.d.ts.map

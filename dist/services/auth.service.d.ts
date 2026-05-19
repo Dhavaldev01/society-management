@@ -1,11 +1,11 @@
 import type { LoginInput, RegisterInput, RegisterSocietyInput } from "../validators/auth.validator.js";
-import type { Role } from "../types/roles.js";
+import { type ClientRole } from "../types/clientRole.js";
 export type SafeUser = {
     id: string;
     email: string;
     fullName: string;
     mobile: string | null;
-    role: Role;
+    role: ClientRole;
     societyId: string | null;
     societyName: string | null;
     createdAt: Date;

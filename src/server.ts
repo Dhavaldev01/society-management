@@ -6,9 +6,12 @@ async function bootstrap() {
   await connectDatabase();
 
   const app = createApp();
-  app.listen(env.PORT, () => {
-    console.log(`API listening on http://localhost:${env.PORT}`);
-  });
+//   app.listen(env.PORT, () => {
+//     console.log(`API listening on http://localhost:${env.PORT}`);
+//   });
+app.listen(env.PORT, "0.0.0.0", () => {
+  console.log(`API listening on http://192.168.1.5:${env.PORT}`);
+});
 }
 
 bootstrap().catch((err) => {
